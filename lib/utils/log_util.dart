@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 class Log {
   factory Log() => _instance!;
@@ -11,16 +12,16 @@ class Log {
 
   final bool production;
 
-  String debug(String tag, [dynamic payload]) {
+  void debug(String tag, [dynamic payload]) {
     String output;
-    if (production) return '';
+    if (production) return log('');
     try {
       output = generator('=', tag, jsonPretty(json.decode(payload)));
     } catch (e) {
       output = generator('=', tag, payload);
     }
 
-    return output;
+    return log(output);
   }
 
   String error(String tag, [dynamic payload]) {
