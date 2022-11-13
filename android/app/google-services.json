@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "585861915263",
+    "project_id": "ourpass-f722d",
+    "storage_bucket": "ourpass-f722d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:585861915263:android:af489a24a80a89d7ff954a",
+        "android_client_info": {
+          "package_name": "com.example.our_pass"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "585861915263-mc5t6slnh4jb4v6tq4v3973pcnqc4ie8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCtlvMkW0stWMXiNilDhaEfG20N_sFB9SQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "585861915263-mc5t6slnh4jb4v6tq4v3973pcnqc4ie8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
