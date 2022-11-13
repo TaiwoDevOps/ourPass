@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:our_pass/core/utils/app_setup.dart';
+import 'package:our_pass/core/services/app_setup.dart';
 import 'package:our_pass/features/splash/splash_screen.dart';
 import 'package:our_pass/providers.dart';
 import 'package:our_pass/utils/theme.dart';

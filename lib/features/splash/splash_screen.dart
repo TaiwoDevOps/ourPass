@@ -29,12 +29,6 @@ class _SplashScreenState extends State<SplashScreen> {
         duration: const Duration(seconds: 2),
         color: appColors.white,
         width: double.infinity,
-        onEnd: () {
-          Log().debug('did timer end');
-          Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(builder: (context) => const LoginScreen()),
-              (Route<dynamic> route) => false);
-        },
         child: Center(
           child: SvgPicture.asset('assets/svg/our_pass.svg'),
         ),

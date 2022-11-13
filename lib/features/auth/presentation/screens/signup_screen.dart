@@ -4,20 +4,20 @@ import 'package:our_pass/features/auth/presentation/widget/form_widget.dart';
 import 'package:our_pass/utils/theme.dart';
 import 'package:provider/provider.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+class SignUpScreen extends StatefulWidget {
+  const SignUpScreen({Key? key}) : super(key: key);
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<SignUpScreen> createState() => _SignUpScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _SignUpScreenState extends State<SignUpScreen> {
   late LoginProvider loginProvider;
 
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      loginProvider.signIn = true;
+      loginProvider.signIn = false;
     });
     super.initState();
   }
@@ -38,7 +38,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   height: 16,
                 ),
                 Text(
-                  'Sign In',
+                  'Sign Up',
                   style: Theme.of(context).textTheme.headline4?.copyWith(
                         color: appColors.black,
                         fontWeight: FontWeight.w600,
