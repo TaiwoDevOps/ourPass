@@ -17,6 +17,6 @@ void _registerStorage() {
 // View models
 void _registerViewModels() {
   sl.registerFactory(
-    () => LoginProvider(),
+    () => AuthProvider(),
   );
 }

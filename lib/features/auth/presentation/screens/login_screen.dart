@@ -12,7 +12,7 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  late LoginProvider loginProvider;
+  late AuthProvider loginProvider;
 
   @override
   void initState() {
@@ -24,9 +24,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    loginProvider = context.watch<LoginProvider>();
+    loginProvider = context.watch<AuthProvider>();
 
-    return Consumer<LoginProvider>(
+    return Consumer<AuthProvider>(
       builder: (_, provider, __) {
         return Scaffold(
           backgroundColor: appColors.white,

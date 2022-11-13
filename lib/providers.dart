@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
 
 final List<SingleChildWidget> providers = [
-  ChangeNotifierProvider<LoginProvider>(
-    create: (_) => GetIt.I<LoginProvider>(),
+  ChangeNotifierProvider<AuthProvider>(
+    create: (_) => GetIt.I<AuthProvider>(),
   ),
 ];

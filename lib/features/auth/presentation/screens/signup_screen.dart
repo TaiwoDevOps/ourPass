@@ -12,7 +12,7 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
-  late LoginProvider loginProvider;
+  late AuthProvider loginProvider;
 
   @override
   void initState() {
@@ -24,9 +24,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   @override
   Widget build(BuildContext context) {
-    loginProvider = context.watch<LoginProvider>();
+    loginProvider = context.watch<AuthProvider>();
 
-    return Consumer<LoginProvider>(
+    return Consumer<AuthProvider>(
       builder: (_, provider, __) {
         return Scaffold(
           backgroundColor: appColors.white,

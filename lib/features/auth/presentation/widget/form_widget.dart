@@ -6,9 +6,9 @@ import 'package:our_pass/utils/theme.dart';
 import 'package:our_pass/utils/validator_util.dart';
 
 class BuildForm extends StatelessWidget {
-  const BuildForm(this.provider, {Key? key}) : super(key: key);
-  final LoginProvider provider;
-  static final _formKey = GlobalKey<FormState>();
+  BuildForm(this.provider, {Key? key}) : super(key: key);
+  final AuthProvider provider;
+  GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
@@ -45,44 +45,59 @@ class BuildForm extends StatelessWidget {
             validator: Validator.password,
             label: 'Password',
             hintText: 'Enter password',
+            obscureText: provider.obscureText,
           ),
           const SizedBox(height: 50),
-          TextButton(
-            onPressed: () {
-              provider.showOtpWidget(context: context);
+          if (provider.loading)
+            const CircularProgressIndicator.adaptive()
+          else
+            TextButton(
+              onPressed: () {
+                if (_formKey.currentState!.validate()) {
+                  if (provider.signIn) {
+                    provider.loading = true;
+                    //call firebase login
+                    provider.authHandler
+                        .handleSignInEmail(
+                          provider.emailTEC.text,
+                          provider.emailTEC.text,
+                        )
+                        .then((value) => {
+                              Navigator.of(context).pushAndRemoveUntil(
+                                  MaterialPageRoute(
+                                      builder: (context) => const HomeScreen()),
+                                  (Route<dynamic> route) => false),
+                            });
+                    provider.loading = false;
 
-              if (_formKey.currentState!.validate()) {
-                if (provider.signIn) {
-                  //call firebase login
-
-                  //if success, navigate to dashboard
-                } else {
-                  //call firebase sign up
-                  provider.showOtpWidget(context: context);
-                  //if successful, navigate to OTP screen
+                    //if success, navigate to dashboard
+                  } else {
+                    //call firebase sign up
+                    provider.showOtpWidget(context: context);
+                    //if successful, navigate to OTP screen
+                  }
                 }
-              }
-            },
-            style: TextButton.styleFrom(
-              backgroundColor: appColors.darkGreen,
-              primary: appColors.white,
-              elevation: 0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(
-                  10,
+              },
+              style: TextButton.styleFrom(
+                backgroundColor: appColors.darkGreen,
+                primary: appColors.white,
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(
+                    10,
+                  ),
+                ),
+                textStyle: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                ),
+                minimumSize: const Size(
+                  double.infinity,
+                  50,
                 ),
               ),
-              textStyle: const TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w700,
-              ),
-              minimumSize: const Size(
-                double.infinity,
-                50,
-              ),
+              child: Text('Sign ${provider.signIn ? 'In' : 'Up'}'),
             ),
-            child: const Text('Sign In'),
-          ),
           const SizedBox(height: 20),
           if (provider.signIn)
             InkWell(
@@ -126,9 +141,11 @@ class BuildForm extends StatelessWidget {
     String? label,
     String? Function(String?)? validator,
     TextEditingController? controller,
+    bool obscureText = false,
   }) {
     return TextFormField(
       controller: controller,
+      obscureText: obscureText,
       decoration: InputDecoration(
         errorMaxLines: 2,
         labelText: label,

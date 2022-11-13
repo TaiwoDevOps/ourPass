@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:our_pass/features/auth/datasource/auth_datasource.dart';
 import 'package:our_pass/features/auth/presentation/widget/otp_inputfield_widget.dart';
 import 'package:our_pass/features/auth/presentation/widget/otp_widget.dart';
 
-class LoginProvider extends ChangeNotifier {
+class AuthProvider extends ChangeNotifier {
+  var authHandler = Auth();
   final TextEditingController emailTEC = TextEditingController();
   final TextEditingController passwordTEC = TextEditingController();
   final TextEditingController userNameTEC = TextEditingController();
@@ -11,14 +13,22 @@ class LoginProvider extends ChangeNotifier {
   bool _signIn = true;
   bool get signIn => _signIn;
   set signIn(bool value) {
+    disposeTEC();
+    _loading = false;
     _signIn = value;
+    notifyListeners();
+  }
+
+  bool _obscureText = true;
+  bool get obscureText => _obscureText;
+  set obscureText(bool value) {
+    _obscureText = value;
     notifyListeners();
   }
 
   bool _loading = false;
   bool get loading => _loading;
   set loading(bool value) {
-    disposeTEC();
     _loading = value;
     notifyListeners();
   }
