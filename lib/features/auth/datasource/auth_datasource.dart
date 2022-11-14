@@ -11,6 +11,7 @@ class Auth {
       await auth.signInWithEmailAndPassword(email: email, password: password);
       final User user = auth.currentUser!;
       await sl<LocalStorage>().clearCachedUserData();
+      //Note: username is 0 and email is 1
       await sl<LocalStorage>()
           .cacheUserData([user.displayName ?? '', user.email ?? '']);
       await sl<LocalStorage>().cachePassword(password);
@@ -29,6 +30,7 @@ class Auth {
 
       final User user = auth.currentUser!;
       await sl<LocalStorage>().clearCachedUserData();
+      //Note: username is 0 and email is 1
       await sl<LocalStorage>()
           .cacheUserData([user.displayName ?? '', user.email ?? '']);
       await sl<LocalStorage>().cachePassword(password);

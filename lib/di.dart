@@ -8,8 +8,8 @@ final sl = GetIt.instance;
 Future<void> initServiceLocator() async {
   _registerOthers();
 
-  _registerStorage();
-  // register viewmodels
+  _registerLocalService();
+  // register viewModels
   _registerViewModels();
 }
 
@@ -19,7 +19,7 @@ Future<void> _registerOthers() async {
   sl.registerFactory<SharedPreferences>(() => sharePreference);
 }
 
-void _registerStorage() {
+void _registerLocalService() {
   sl.registerFactory<LocalStorage>(() => LocalStorageImpl(sl()));
 }
 

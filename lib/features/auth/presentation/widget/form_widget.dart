@@ -47,7 +47,7 @@ class BuildForm extends StatelessWidget {
             validator: Validator.password,
             label: 'Password',
             hintText: 'Enter password',
-            obscureText: provider.obscureText,
+            obscureText: true,
           ),
           const SizedBox(height: 50),
           if (provider.loading)
@@ -120,29 +120,74 @@ class BuildForm extends StatelessWidget {
                         builder: (context) => const SignUpScreen()),
                     (Route<dynamic> route) => false);
               },
-              child: Align(
-                child: RichText(
-                  text: TextSpan(
-                    text: "Don't have an account ? ",
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 14,
-                      color: appColors.black.withOpacity(.4),
-                    ),
-                    children: [
-                      TextSpan(
-                        text: 'Sign Up here',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: appColors.green,
-                        ),
-                      )
-                    ],
+              child: RichText(
+                text: TextSpan(
+                  text: "Don't have an account ? ",
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                    color: appColors.black.withOpacity(.4),
                   ),
+                  children: [
+                    TextSpan(
+                      text: 'Sign Up here',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: appColors.green,
+                      ),
+                    )
+                  ],
                 ),
               ),
             ),
+          const SizedBox(
+            height: 50,
+          ),
+          if (provider.signIn && provider.canAuthLocally)
+            Center(
+              child: CircleAvatar(
+                radius: 35,
+                backgroundColor: appColors.green,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: IconButton(
+                    iconSize: 64,
+                    icon: Icon(
+                      Icons.fingerprint,
+                      size: 40,
+                      color: appColors.white,
+                    ),
+                    onPressed: () async {
+                      final res = await provider.localAuthHandler
+                          .handleLocalAuthSignIn();
+                      if (res) {
+                        provider.loading = true;
+                        //call firebase login
+                        provider.authHandler
+                            .handleSignInEmail(
+                              provider.emailTEC.text.trim(),
+                              provider.tempPassword,
+                            )
+                            .then(
+                              (user) => {
+                                provider.loading = false,
+                                if (user != null)
+                                  {
+                                    Navigator.of(context).pushAndRemoveUntil(
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const HomeScreen()),
+                                        (Route<dynamic> route) => false),
+                                  }
+                              },
+                            );
+                      }
+                    },
+                  ),
+                ),
+              ),
+            )
         ],
       ),
     );

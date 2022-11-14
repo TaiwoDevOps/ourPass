@@ -37,6 +37,7 @@ class LocalStorageImpl implements LocalStorage {
     if (data == null) {
       await sharedPreferences.remove(kUser);
     } else {
+      //Note: username is 0 and email is 1
       await sharedPreferences.setStringList(kUser, data);
     }
   }
