@@ -44,14 +44,14 @@ class BottomSheetWidget extends StatelessWidget {
                           Navigator.pop(context);
                           onDismissed?.call();
                         },
-                        icon: const Icon(
+                        icon: Icon(
                           Icons.close,
-                          color: Color(0xff333D47),
+                          color: appColors.white,
                         ),
                         label: Text(
                           'Close',
                           style: Theme.of(context).textTheme.bodyText1!.apply(
-                                color: const Color(0xff333D47),
+                                color: appColors.white,
                               ),
                         ),
                       ),

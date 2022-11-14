@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:our_pass/features/auth/presentation/screens/signup_screen.dart';
 import 'package:our_pass/features/auth/presentation/viewmodel/login_vm.dart';
 import 'package:our_pass/features/dashboard/dashboard.dart';
@@ -35,6 +36,7 @@ class BuildForm extends StatelessWidget {
             validator: Validator.emailValidator,
             label: 'Email',
             hintText: 'Enter email address',
+            inputFormatters: [FilteringTextInputFormatter.deny(RegExp(r'\s'))],
           ),
           const SizedBox(
             height: 10,
@@ -59,28 +61,39 @@ class BuildForm extends StatelessWidget {
                     //call firebase login
                     provider.authHandler
                         .handleSignInEmail(
-                          provider.emailTEC.text,
-                          provider.emailTEC.text,
+                          provider.emailTEC.text.trim(),
+                          provider.passwordTEC.text,
                         )
-                        .then((value) => {
-                              Navigator.of(context).pushAndRemoveUntil(
-                                  MaterialPageRoute(
-                                      builder: (context) => const HomeScreen()),
-                                  (Route<dynamic> route) => false),
-                            });
-                    provider.loading = false;
-
-                    //if success, navigate to dashboard
+                        .then(
+                          (user) => {
+                            provider.loading = false,
+                            if (user != null)
+                              {
+                                Navigator.of(context).pushAndRemoveUntil(
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            const HomeScreen()),
+                                    (Route<dynamic> route) => false),
+                              }
+                          },
+                        );
                   } else {
+                    provider.loading = true;
+
                     //call firebase sign up
-                    provider.showOtpWidget(context: context);
+                    Future.delayed(const Duration(milliseconds: 500)).then(
+                      (value) => {
+                        provider.loading = false,
+                        provider.showOtpWidget(context),
+                      },
+                    );
                     //if successful, navigate to OTP screen
                   }
                 }
               },
               style: TextButton.styleFrom(
+                foregroundColor: appColors.white,
                 backgroundColor: appColors.darkGreen,
-                primary: appColors.white,
                 elevation: 0,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(
@@ -142,10 +155,12 @@ class BuildForm extends StatelessWidget {
     String? Function(String?)? validator,
     TextEditingController? controller,
     bool obscureText = false,
+    List<TextInputFormatter>? inputFormatters,
   }) {
     return TextFormField(
       controller: controller,
       obscureText: obscureText,
+      inputFormatters: inputFormatters,
       decoration: InputDecoration(
         errorMaxLines: 2,
         labelText: label,

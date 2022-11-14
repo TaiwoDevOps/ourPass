@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:our_pass/features/auth/presentation/viewmodel/login_vm.dart';
 import 'package:our_pass/utils/theme.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
+import 'package:provider/provider.dart';
 
 class CustomOtpInputField extends StatefulWidget {
   const CustomOtpInputField({
@@ -19,6 +21,7 @@ class CustomOtpInputField extends StatefulWidget {
 class _CustomOtpInputFieldState extends State<CustomOtpInputField> {
   @override
   Widget build(BuildContext context) {
+    final signUpProvider = context.watch<AuthProvider>();
     return PinCodeTextField(
       appContext: context,
       pastedTextStyle: TextStyle(
@@ -30,14 +33,10 @@ class _CustomOtpInputFieldState extends State<CustomOtpInputField> {
       obscuringCharacter: '*',
       blinkWhenObscuring: true,
       animationType: AnimationType.fade,
-      validator: (v) {
-        if (v!.length < 3) {
-          return "I'm from validator";
-        } else {
-          return null;
-        }
-      },
       pinTheme: PinTheme(
+        activeColor: appColors.green,
+        selectedColor: appColors.darkGreen,
+        inactiveColor: appColors.black.withOpacity(0.4),
         shape: PinCodeFieldShape.box,
         borderRadius: BorderRadius.circular(5),
         fieldHeight: 50,
@@ -49,11 +48,14 @@ class _CustomOtpInputFieldState extends State<CustomOtpInputField> {
       controller: widget.controller,
       keyboardType: TextInputType.number,
       onCompleted: (v) {
-        debugPrint("Completed");
         FocusScope.of(context).requestFocus(FocusNode());
       },
       onChanged: (value) {
-        debugPrint(value);
+        if (value.length != 6) {
+          signUpProvider.otpValid = false;
+        } else {
+          signUpProvider.otpValid = true;
+        }
       },
     );
   }

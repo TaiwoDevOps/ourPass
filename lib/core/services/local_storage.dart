@@ -1,10 +1,7 @@
 // local persistence
-import 'dart:convert';
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-const kToken = 'token';
 const kPassword = 'password';
 const kUser = 'user';
 
@@ -12,8 +9,8 @@ abstract class LocalStorage {
   Future<void> cachePassword(String? password);
   String getPassword();
 
-  Future<void> cacheUserData(User? data);
-  dynamic getCachedUserData();
+  Future<void> cacheUserData(List<String>? data);
+  List<String>? getCachedUserData();
   Future<bool> clearCachedUserData();
 }
 
@@ -36,23 +33,23 @@ class LocalStorageImpl implements LocalStorage {
   }
 
   @override
-  Future<void> cacheUserData(User? data) async {
+  Future<void> cacheUserData(List<String>? data) async {
     if (data == null) {
       await sharedPreferences.remove(kUser);
     } else {
-      await sharedPreferences.setString(kUser, data.toString());
+      await sharedPreferences.setStringList(kUser, data);
     }
   }
 
   @override
-  dynamic getCachedUserData() {
-    final userJson = sharedPreferences.getString(kUser);
+  List<String>? getCachedUserData() {
+    final userJson = sharedPreferences.getStringList(kUser);
     return userJson;
   }
 
   @override
   Future<bool> clearCachedUserData() {
-    final userJson = sharedPreferences.remove(kUser);
-    return userJson;
+    final res = sharedPreferences.remove(kUser);
+    return res;
   }
 }

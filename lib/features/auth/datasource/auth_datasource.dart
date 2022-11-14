@@ -1,4 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:our_pass/core/services/local_storage.dart';
+import 'package:our_pass/di.dart';
 import 'package:our_pass/utils/notification_util.dart';
 
 class Auth {
@@ -6,10 +8,12 @@ class Auth {
 
   Future<User?> handleSignInEmail(String email, String password) async {
     try {
-      UserCredential result = await auth.signInWithEmailAndPassword(
-          email: email, password: password);
-      final User user = result.user!;
-
+      await auth.signInWithEmailAndPassword(email: email, password: password);
+      final User user = auth.currentUser!;
+      await sl<LocalStorage>().clearCachedUserData();
+      await sl<LocalStorage>()
+          .cacheUserData([user.displayName ?? '', user.email ?? '']);
+      await sl<LocalStorage>().cachePassword(password);
       return user;
     } catch (e) {
       showErrorNotification(e.toString().split("]").last);
@@ -17,16 +21,29 @@ class Auth {
     return null;
   }
 
-  Future<User?> handleSignUp(email, password) async {
+  Future<User?> handleSignUp(email, password, userName) async {
     try {
-      UserCredential result = await auth.createUserWithEmailAndPassword(
+      await auth.createUserWithEmailAndPassword(
           email: email, password: password);
-      final User user = result.user!;
+      await auth.currentUser!.updateDisplayName(userName);
 
+      final User user = auth.currentUser!;
+      await sl<LocalStorage>().clearCachedUserData();
+      await sl<LocalStorage>()
+          .cacheUserData([user.displayName ?? '', user.email ?? '']);
+      await sl<LocalStorage>().cachePassword(password);
       return user;
     } catch (e) {
       showErrorNotification(e.toString().split("]").last);
     }
     return null;
+  }
+
+  Future<void> handleSignOut() async {
+    try {
+      await auth.signOut();
+    } catch (e) {
+      showErrorNotification('Something went wrong!');
+    }
   }
 }

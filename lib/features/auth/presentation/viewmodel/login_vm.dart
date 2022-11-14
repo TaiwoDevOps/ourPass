@@ -1,14 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:our_pass/core/services/local_storage.dart';
+import 'package:our_pass/di.dart';
 import 'package:our_pass/features/auth/datasource/auth_datasource.dart';
 import 'package:our_pass/features/auth/presentation/widget/otp_inputfield_widget.dart';
 import 'package:our_pass/features/auth/presentation/widget/otp_widget.dart';
+import 'package:our_pass/features/dashboard/dashboard.dart';
+import 'package:our_pass/utils/notification_util.dart';
+import 'package:our_pass/utils/theme.dart';
 
 class AuthProvider extends ChangeNotifier {
   var authHandler = Auth();
   final TextEditingController emailTEC = TextEditingController();
   final TextEditingController passwordTEC = TextEditingController();
   final TextEditingController userNameTEC = TextEditingController();
-  final TextEditingController pinTEC = TextEditingController();
+
+  List? _userData;
+  List? get userData => _userData;
+  set userData(List? value) {
+    _userData = value;
+    notifyListeners();
+  }
+
+  void init() {
+    userData = sl<LocalStorage>().getCachedUserData();
+    emailTEC.text = userData?[1] ?? '';
+  }
 
   bool _signIn = true;
   bool get signIn => _signIn;
@@ -33,15 +49,20 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  bool _otpValid = false;
+  bool get otpValid => _otpValid;
+  set otpValid(bool value) {
+    _otpValid = value;
+    notifyListeners();
+  }
+
   void disposeTEC() {
     emailTEC.clear();
     passwordTEC.clear();
     userNameTEC.clear();
   }
 
-  void showOtpWidget({
-    required BuildContext context,
-  }) {
+  void showOtpWidget(BuildContext context) {
     showModalBottomSheet(
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
@@ -92,10 +113,60 @@ class AuthProvider extends ChangeNotifier {
               Padding(
                 padding: EdgeInsets.zero,
                 child: CustomOtpInputField(
-                  controller: pinTEC,
-                  currentCode: pinTEC.text,
+                  controller: TextEditingController(),
+                  currentCode: '',
                 ),
               ),
+              const SizedBox(
+                height: 48,
+              ),
+              if (loading)
+                const CircularProgressIndicator.adaptive()
+              else
+                TextButton(
+                  onPressed: () async {
+                    if (!otpValid) {
+                      showInfoNotification('Invalid OTP entered');
+                      return;
+                    }
+
+                    loading = true;
+                    //call firebase login
+                    final user = await authHandler.handleSignUp(
+                      emailTEC.text.trim(),
+                      passwordTEC.text,
+                      userNameTEC.text,
+                    );
+
+                    if (user != null) {
+                      Navigator.of(context).pushAndRemoveUntil(
+                          MaterialPageRoute(
+                              builder: (context) => const HomeScreen()),
+                          (Route<dynamic> route) => false);
+                    }
+                    loading = false;
+                    //if successful, navigate to OTP screen
+                  },
+                  style: TextButton.styleFrom(
+                    foregroundColor: appColors.white,
+                    backgroundColor: appColors.darkGreen,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(
+                        10,
+                      ),
+                    ),
+                    textStyle: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                    ),
+                    minimumSize: const Size(
+                      double.infinity,
+                      50,
+                    ),
+                  ),
+                  child: const Text('Sign Up'),
+                ),
               const Spacer(),
               const SizedBox(
                 height: 48,

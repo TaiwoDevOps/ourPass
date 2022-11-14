@@ -17,7 +17,9 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      loginProvider.signIn = true;
+      loginProvider
+        ..signIn = true
+        ..init();
     });
     super.initState();
   }
