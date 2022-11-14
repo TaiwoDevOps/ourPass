@@ -1,5 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.our_pass">
+     <uses-permission android:name="android.permission.USE_BIOMETRIC"/>
    <application
         android:label="our_pass"
         android:name="${applicationName}"

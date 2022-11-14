@@ -1,16 +1,46 @@
 import 'package:flutter/material.dart';
-import 'package:our_pass/features/auth/presentation/widget/otp_inputfield_widget.dart';
+import 'package:our_pass/core/services/local_storage.dart';
+import 'package:our_pass/di.dart';
+import 'package:our_pass/features/auth/datasource/auth_datasource.dart';
+import 'package:our_pass/features/auth/datasource/local_auth.dart';
 import 'package:our_pass/features/auth/presentation/widget/otp_widget.dart';
 
-class LoginProvider extends ChangeNotifier {
+class AuthProvider extends ChangeNotifier {
+  var authHandler = Auth();
+  var localAuthHandler = LocalAuth();
   final TextEditingController emailTEC = TextEditingController();
   final TextEditingController passwordTEC = TextEditingController();
   final TextEditingController userNameTEC = TextEditingController();
-  final TextEditingController pinTEC = TextEditingController();
+
+  String tempPassword = '';
+  List? _userData;
+  List? get userData => _userData; //NOTE: username => 0, email => 1
+  set userData(List? value) {
+    _userData = value;
+    notifyListeners();
+  }
+
+  bool _canAuthLocally = false;
+  bool get canAuthLocally => _canAuthLocally;
+  set canAuthLocally(bool value) {
+    _canAuthLocally = value;
+    notifyListeners();
+  }
+
+  void init() async {
+    userData = sl<LocalStorage>().getCachedUserData();
+    tempPassword = sl<LocalStorage>().getPassword();
+    emailTEC.text = userData?[1] ?? '';
+    _canAuthLocally = userData![1].toString().isNotEmpty &&
+        tempPassword.isNotEmpty &&
+        await localAuthHandler.checkLocalAuthSignIn();
+  }
 
   bool _signIn = true;
   bool get signIn => _signIn;
   set signIn(bool value) {
+    disposeTEC();
+    _loading = false;
     _signIn = value;
     notifyListeners();
   }
@@ -18,8 +48,14 @@ class LoginProvider extends ChangeNotifier {
   bool _loading = false;
   bool get loading => _loading;
   set loading(bool value) {
-    disposeTEC();
     _loading = value;
+    notifyListeners();
+  }
+
+  bool _otpValid = false;
+  bool get otpValid => _otpValid;
+  set otpValid(bool value) {
+    _otpValid = value;
     notifyListeners();
   }
 
@@ -27,11 +63,10 @@ class LoginProvider extends ChangeNotifier {
     emailTEC.clear();
     passwordTEC.clear();
     userNameTEC.clear();
+    tempPassword = '';
   }
 
-  void showOtpWidget({
-    required BuildContext context,
-  }) {
+  void showOtpWidget(BuildContext context) {
     showModalBottomSheet(
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
@@ -39,61 +74,7 @@ class LoginProvider extends ChangeNotifier {
       isDismissible: false,
       enableDrag: false,
       context: context,
-      builder: (context) => BottomSheetWidget(
-        sheetBody: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 44, horizontal: 24),
-          child: Column(
-            children: [
-              Text(
-                'OTP Verification',
-                style: Theme.of(context).textTheme.subtitle1!.copyWith(
-                      color: const Color(0xff333D47),
-                      fontWeight: FontWeight.w600,
-                      height: 1.5,
-                    ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(
-                height: 8,
-              ),
-              Text(
-                'Enter any random six(6) digit',
-                style: Theme.of(context).textTheme.bodyText2!.copyWith(
-                      color: const Color(0xff6C7884),
-                      fontWeight: FontWeight.w400,
-                    ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(
-                height: 48,
-              ),
-              const Padding(
-                padding: EdgeInsets.zero,
-                child: SizedBox(
-                  width: double.infinity,
-                  child: Text(
-                    'Enter OTP',
-                  ),
-                ),
-              ),
-              const SizedBox(
-                height: 8,
-              ),
-              Padding(
-                padding: EdgeInsets.zero,
-                child: CustomOtpInputField(
-                  controller: pinTEC,
-                  currentCode: pinTEC.text,
-                ),
-              ),
-              const Spacer(),
-              const SizedBox(
-                height: 48,
-              ),
-            ],
-          ),
-        ),
-      ),
+      builder: (context) => BottomSheetWidget(),
     );
   }
 }

@@ -1,37 +1,22 @@
 // local persistence
+
 import 'package:shared_preferences/shared_preferences.dart';
 
-const kToken = 'token';
 const kPassword = 'password';
 const kUser = 'user';
 
 abstract class LocalStorage {
-  Future<void> cacheToken(String? token);
-  String? getToken();
-
   Future<void> cachePassword(String? password);
   String getPassword();
 
+  Future<void> cacheUserData(List<String>? data);
+  List<String>? getCachedUserData();
   Future<bool> clearCachedUserData();
 }
 
 class LocalStorageImpl implements LocalStorage {
   LocalStorageImpl(this.sharedPreferences);
   SharedPreferences sharedPreferences;
-
-  @override
-  Future<void> cacheToken(String? token) async {
-    if (token == null) {
-      await sharedPreferences.remove(kToken);
-    } else {
-      await sharedPreferences.setString(kToken, token);
-    }
-  }
-
-  @override
-  String? getToken() {
-    return sharedPreferences.getString(kToken);
-  }
 
   @override
   Future<void> cachePassword(String? password) async {
@@ -48,8 +33,24 @@ class LocalStorageImpl implements LocalStorage {
   }
 
   @override
-  Future<bool> clearCachedUserData() {
-    final userJson = sharedPreferences.remove(kUser);
+  Future<void> cacheUserData(List<String>? data) async {
+    if (data == null) {
+      await sharedPreferences.remove(kUser);
+    } else {
+      //Note: username is 0 and email is 1
+      await sharedPreferences.setStringList(kUser, data);
+    }
+  }
+
+  @override
+  List<String>? getCachedUserData() {
+    final userJson = sharedPreferences.getStringList(kUser);
     return userJson;
+  }
+
+  @override
+  Future<bool> clearCachedUserData() {
+    final res = sharedPreferences.remove(kUser);
+    return res;
   }
 }
